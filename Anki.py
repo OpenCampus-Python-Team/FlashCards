@@ -1,175 +1,110 @@
+import tkinter as tk
 import random
-def read_answer() -> str:
-    """
-    Reads input from the user and validates it, by calling itself recursively.
-
-    :returns: either "A", "B", "C" or "" when the question is skipped.
-    """
-
-    user_input = input("Which answer is correct? A, B, C? or press Enter to skip \n").upper()
-
-    if user_input not in ["A", "B", "C", ""]:
-        print("Please only enter A, B, C or press Enter to skip \n")
-        return read_answer()
-
-    return user_input
-
 
 class Card:
-    # class atributes
     question: str
-    answer_possiblities: list[str] = []
+    answer_possibilities: list[str] = []
     correct_answer: str
     difficulty: int
-    ANWSER_KEY = {"A": 0, "B": 1, "C": 2}
+    ANSWER_KEY = {"A": 0, "B": 1, "C": 2}
 
-    # constructor
     def __init__(self, args: list[str]):
-        help_l = []
-        # NOTE: input should be in format: ['What is the output of the following code snippet?', '10', '5', '25', '10']
-        self.question = args[0]  # pos of question
-        for i in range(0, 3):
-            help_l.append(args[1+i])
-        self.answer_possiblities.append(help_l)  # append answers to empty list
-        self.correct_answer = args[-1]  # correct answer at last position in list
-        # self.difficulty = 0  # default value
+        self.question = args[0]
+        self.answer_possibilities = args[1:4]
+        self.correct_answer = args[-1]
         self.difficulty = int(args[-2])
 
-    def print_question(self,card) -> None:
-        # prints question
+    def print_question(self) -> None:
         print(self.question)
-        #print(len(self.answer_possiblities))
-        print(f"A) {self.answer_possiblities[card][0]}  B) {self.answer_possiblities[card][1]}  C) {self.answer_possiblities[card][2]}")
+        print(f"A) {self.answer_possibilities[0]}  B) {self.answer_possibilities[1]}  C) {self.answer_possibilities[2]}")
 
     def is_correct(self, answer: str) -> bool:
-        # translates the answer with ANSWER_KEY, then checks if choosen answer is correct
-        # returns bool
-        # return self.answer_possiblities[self.ANWSER_KEY[answer]] == self.correct_answer
         return answer == self.correct_answer
 
-
-    def print_answer(self) -> None:
-        # prints answer
-        print(f"The right answer is: {self.correct_answer}")
+    def print_answer(self) -> str:
+        return f"The right answer is: {self.correct_answer}"
 
     def update_difficult(self, new_difficulty: int) -> None:
-        # updates difficulty
         self.difficulty = new_difficulty
 
 class Deck:
-    # class attributes
     cards: list[Card]
     total_points: int
 
-    # constructor
     def __init__(self, filename):
-        # NOTE: input should be in format: ['What is the output of the following code snippet?', '10', '5', '25', '5','10']
         self.load_cards_from_file(filename)
         self.set_total_points()
 
     def load_cards_from_file(self, filename):
         l = []
-        file = open(filename ,mode='r')
-        lines = file.readlines()
-        file.close()
-        directed = lines[0] == 'directed\n'
+        with open(filename, mode='r') as file:
+            lines = file.readlines()
         lines = lines[1:]
         for line in lines:
             cols = line.strip().split(";")
             l.append(cols)
 
-        # List of Class of each card
-        self.cards = []
-        for i in range(0 ,len(l)):
-            self.cards.append(Card(l[i]))
-        # list_of_cards[X].is_correct("A") would work because its working on a Class
+        self.cards = [Card(card_info) for card_info in l]
 
     def set_total_points(self):
-        self.total_points = 0
-        for card in self.cards:
-            self.total_points += card.difficulty
+        self.total_points = sum(card.difficulty for card in self.cards)
 
-def study():
-    score = 0
-    keep_going = True
-    #cards_counter = 1# 0 because we start with the Card 1 which is in the Programm the 0 and
-    topics = ["arts", "biology", "greography", "python"]
-    viewed_cards = []
+def update_text(text):
+    label.config(text=text)  # Update the label text
 
-    file_name = ""
-    while file_name not in topics:
-        print("Please, type which topic want to study:")
-        print(*topics, sep = ", ") 
-        file_name = input("").lower()
-        if file_name not in topics:
-            print("Type a valid topic")
+def button_click(answer):
+    result = "CORRECT" if current_card.is_correct(answer) else "INCORRECT"
+    if result == "INCORRECT":
+        result = result + " " + current_card.print_answer()
+    update_text(result)
+    window.after(2000, next_question)  # Wait for 2 seconds before showing the next question
 
-    deck = Deck(file_name + ".csv")
-    print("\n")
-    
-    played_points = 0
-    while keep_going and len(viewed_cards) < len(deck.cards):
-        current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
-        viewed_cards.append(current_card_number)
-        current_card = deck.cards[current_card_number]
-        played_points += current_card.difficulty
-        score += play_card(current_card, current_card_number)
-        print("\n")
-        if len(viewed_cards) < len(deck.cards):
-            Continue = input("Want to continue ? press Enter for yes and Type n for no \n")
-            if Continue == "n":
-                keep_going = False
-            print("\n")
-    
-    print_results(score = score, total_points = played_points)
-
+def next_question():
+    global current_card, current_card_number
+    current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
+    viewed_cards.append(current_card_number)
+    current_card = deck.cards[current_card_number]
+    update_question()
 
 def get_unseen_card_number(total_cards, viewed_cards):
-    card_number=-1
-    while card_number==-1 or card_number in viewed_cards:
-        card_number = random.randint(0,total_cards-1)
-    
+    card_number = -1
+    while card_number == -1 or card_number in viewed_cards:
+        card_number = random.randint(0, total_cards - 1)
     return card_number
 
+def update_question():
+    label.config(text=current_card.question)
+    A_button.config(text=current_card.answer_possibilities[0])
+    B_button.config(text=current_card.answer_possibilities[1])
+    C_button.config(text=current_card.answer_possibilities[2])
 
-def play_card(card: Card, card_number: int):
-    score_achieved = 0
-    print(f"CARD No.{card_number + 1}")
-    print(f"Card difficulty: {card.difficulty}")
-    card.print_question(card_number)
-    answer = read_answer()
-    is_correct = card.is_correct(answer)
-    result = "CORRECT" if is_correct else "INCORRECT"
-    print(f'Your answer is {result}.')
+window = tk.Tk()
+window.title("Anki")
 
-    if is_correct:
-        score_achieved = card.difficulty
-    else:
-        card.print_answer()
+deck = Deck("python.csv")
+viewed_cards = []
+current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
+viewed_cards.append(current_card_number)
+current_card = deck.cards[current_card_number]
 
-    return score_achieved
+main_frame = tk.Frame(window)
+main_frame.pack(expand=True)
 
+label = tk.Label(main_frame, text=current_card.question, font=("Helvetica", 16))
+label.pack(pady=20)
 
-def print_results(score, total_points):
-    grade = (score / total_points) * 100
-    score_out_of = f"Your final score is: {score} out of {total_points} points."
-    if grade > 80:
-        print(f"Congratulations! {score_out_of}")
-    elif grade > 70:
-        print(f"You did a good job! {score_out_of}")
-    elif grade > 60:
-        print(f"You passed! {score_out_of}")
-    else:
-        print(f"You need to study more. {score_out_of}")
+button_frame = tk.Frame(main_frame)
+button_frame.pack()
 
+A_button = tk.Button(button_frame, text=current_card.answer_possibilities[0], command=lambda: button_click("A"))
+A_button.pack(side=tk.LEFT, padx=5)
 
-study()
+B_button = tk.Button(button_frame, text=current_card.answer_possibilities[1], command=lambda: button_click("B"))
+B_button.pack(side=tk.LEFT, padx=5)
 
-# card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
-# card.update_difficult(5)
-# print(f"Card difficulty: {card.difficulty}")
-# card.print_question(0)
-# answer = read_answer()
-# is_correct = card.is_correct(answer)
-# result = "CORRECT" if is_correct else "INCORRECT"
-# print(f'Your answer is {result}.')
+C_button = tk.Button(button_frame, text=current_card.answer_possibilities[2], command=lambda: button_click("C"))
+C_button.pack(side=tk.LEFT, padx=5)
+
+main_frame.pack(expand=True, anchor='center')
+
+tk.mainloop()
