@@ -65,9 +65,7 @@ class Deck:
     def __init__(self, filename):
         # NOTE: input should be in format: ['What is the output of the following code snippet?', '10', '5', '25', '5','10']
         self.load_cards_from_file(filename)
-        self.total_points = 0
-        for card in self.cards:
-            self.total_points += card.difficulty
+        self.set_total_points()
 
     def load_cards_from_file(self, filename):
         l = []
@@ -86,51 +84,92 @@ class Deck:
             self.cards.append(Card(l[i]))
         # list_of_cards[X].is_correct("A") would work because its working on a Class
 
+    def set_total_points(self):
+        self.total_points = 0
+        for card in self.cards:
+            self.total_points += card.difficulty
 
 def study():
     score = 0
     keep_going = True
     #cards_counter = 1# 0 because we start with the Card 1 which is in the Programm the 0 and
-    current_card_number = 0
-    deck = Deck("questions_edu.csv")
-    while keep_going:
-        current_card_number = random.randint(0,len(deck.cards)-1)
-        current_card = deck.cards[current_card_number]
-        print(f"CARD No.{current_card_number}")
-        print(f"Card difficulty: {current_card.difficulty}")
-        current_card.print_question(current_card_number)
-        answer = read_answer()
-        is_correct = current_card.is_correct(answer)
-        result = "CORRECT" if is_correct else "INCORRECT"
-        print(f'Your answer is {result}.')
+    topics = ["arts", "biology", "greography", "python"]
+    viewed_cards = []
 
-        if is_correct:
-            score += current_card.difficulty
-        else:
-            current_card.print_answer()
+    file_name = ""
+    while file_name not in topics:
+        print("Please, type which topic want to study:")
+        print(*topics, sep = ", ") 
+        file_name = input("").lower()
+        if file_name not in topics:
+            print("Type a valid topic")
+
+    deck = Deck(file_name + ".csv")
+    print("\n")
+    
+    played_points = 0
+    while keep_going and len(viewed_cards) < len(deck.cards):
+        current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
+        viewed_cards.append(current_card_number)
+        current_card = deck.cards[current_card_number]
+        played_points += current_card.difficulty
+        score += play_card(current_card, current_card_number)
         print("\n")
-        Continue = input("Want to continue ? press Enter for yes and Type n for no \n")
-        if Continue == "n":
-            keep_going = False
-        
-    grade = (score / deck.total_points) * 100
-    score_out_of = f"{score} out of {deck.total_points}"
-    if grade > 80:
-        print(f"Congratulations! Your final score is: {score_out_of}.")
-    elif grade > 70:
-        print(f"You did a good job! Your final score is: {score_out_of}.")
-    elif grade > 60:
-        print(f"You passed! Your final score is: {score_out_of}.")
+        if len(viewed_cards) < len(deck.cards):
+            Continue = input("Want to continue ? press Enter for yes and Type n for no \n")
+            if Continue == "n":
+                keep_going = False
+            print("\n")
+    
+    print_results(score = score, total_points = played_points)
+
+
+def get_unseen_card_number(total_cards, viewed_cards):
+    card_number=-1
+    while card_number==-1 or card_number in viewed_cards:
+        card_number = random.randint(0,total_cards-1)
+    
+    return card_number
+
+
+def play_card(card: Card, card_number: int):
+    score_achieved = 0
+    print(f"CARD No.{card_number + 1}")
+    print(f"Card difficulty: {card.difficulty}")
+    card.print_question(card_number)
+    answer = read_answer()
+    is_correct = card.is_correct(answer)
+    result = "CORRECT" if is_correct else "INCORRECT"
+    print(f'Your answer is {result}.')
+
+    if is_correct:
+        score_achieved = card.difficulty
     else:
-        print(f"You need to study more. Your final score is: {score_out_of}.")
+        card.print_answer()
+
+    return score_achieved
+
+
+def print_results(score, total_points):
+    grade = (score / total_points) * 100
+    score_out_of = f"Your final score is: {score} out of {total_points} points."
+    if grade > 80:
+        print(f"Congratulations! {score_out_of}")
+    elif grade > 70:
+        print(f"You did a good job! {score_out_of}")
+    elif grade > 60:
+        print(f"You passed! {score_out_of}")
+    else:
+        print(f"You need to study more. {score_out_of}")
+
 
 study()
 
-card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
-card.update_difficult(5)
-print(f"Card difficulty: {card.difficulty}")
-card.print_question(0)
-answer = read_answer()
-is_correct = card.is_correct(answer)
-result = "CORRECT" if is_correct else "INCORRECT"
-print(f'Your answer is {result}.')
+# card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
+# card.update_difficult(5)
+# print(f"Card difficulty: {card.difficulty}")
+# card.print_question(0)
+# answer = read_answer()
+# is_correct = card.is_correct(answer)
+# result = "CORRECT" if is_correct else "INCORRECT"
+# print(f'Your answer is {result}.')
