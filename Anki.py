@@ -1,4 +1,4 @@
-
+import random
 def read_answer() -> str:
     """
     Reads input from the user and validates it, by calling itself recursively.
@@ -38,7 +38,7 @@ class Card:
     def print_question(self,card) -> None:
         # prints question
         print(self.question)
-        #print(self.answer_possiblities)
+        #print(len(self.answer_possiblities))
         print(f"A) {self.answer_possiblities[card][0]}  B) {self.answer_possiblities[card][1]}  C) {self.answer_possiblities[card][2]}")
 
     def is_correct(self, answer: str) -> bool:
@@ -89,23 +89,29 @@ class Deck:
 
 def study():
     score = 0
-    cards_counter = 1# 0 because we start with the Card 1 which is in the Programm the 0 and
+    keep_going = True
+    #cards_counter = 1# 0 because we start with the Card 1 which is in the Programm the 0 and
+    current_card_number = 0
     deck = Deck("questions_edu.csv")
-    for card in deck.cards:
-        print(f"CARD No.{cards_counter}")
-        print(f"Card difficulty: {card.difficulty}")
-        card.print_question(deck.cards.index(card))
+    while keep_going:
+        current_card_number = random.randint(0,len(deck.cards)-1)
+        current_card = deck.cards[current_card_number]
+        print(f"CARD No.{current_card_number}")
+        print(f"Card difficulty: {current_card.difficulty}")
+        current_card.print_question(current_card_number)
         answer = read_answer()
-        is_correct = card.is_correct(answer)
+        is_correct = current_card.is_correct(answer)
         result = "CORRECT" if is_correct else "INCORRECT"
         print(f'Your answer is {result}.')
 
         if is_correct:
-            score += card.difficulty
+            score += current_card.difficulty
         else:
-            card.print_answer()
+            current_card.print_answer()
         print("\n")
-        cards_counter+=1
+        Continue = input("Want to continue ? press Enter for yes and Type n for no \n")
+        if Continue == "n":
+            keep_going = False
         
     grade = (score / deck.total_points) * 100
     score_out_of = f"{score} out of {deck.total_points}"
@@ -123,7 +129,7 @@ study()
 card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
 card.update_difficult(5)
 print(f"Card difficulty: {card.difficulty}")
-card.print_question()
+card.print_question(0)
 answer = read_answer()
 is_correct = card.is_correct(answer)
 result = "CORRECT" if is_correct else "INCORRECT"
