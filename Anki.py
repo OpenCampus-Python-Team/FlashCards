@@ -25,18 +25,21 @@ class Card:
 
     # constructor
     def __init__(self, args: list[str]):
+        help_l = []
         # NOTE: input should be in format: ['What is the output of the following code snippet?', '10', '5', '25', '10']
         self.question = args[0]  # pos of question
         for i in range(0, 3):
-            self.answer_possiblities.append(args[ 1 +i])  # append answers to empty list
+            help_l.append(args[1+i])
+        self.answer_possiblities.append(help_l)  # append answers to empty list
         self.correct_answer = args[-1]  # correct answer at last position in list
         # self.difficulty = 0  # default value
         self.difficulty = int(args[-2])
 
-    def print_question(self) -> None:
+    def print_question(self,card) -> None:
         # prints question
         print(self.question)
-        print(f"A) {self.answer_possiblities[0]}  B) {self.answer_possiblities[1]}  C) {self.answer_possiblities[2]}")
+        #print(self.answer_possiblities)
+        print(f"A) {self.answer_possiblities[card][0]}  B) {self.answer_possiblities[card][1]}  C) {self.answer_possiblities[card][2]}")
 
     def is_correct(self, answer: str) -> bool:
         # translates the answer with ANSWER_KEY, then checks if choosen answer is correct
@@ -86,13 +89,12 @@ class Deck:
 
 def study():
     score = 0
-    cards_counter = 1
+    cards_counter = 1# 0 because we start with the Card 1 which is in the Programm the 0 and
     deck = Deck("questions_edu.csv")
-
     for card in deck.cards:
         print(f"CARD No.{cards_counter}")
         print(f"Card difficulty: {card.difficulty}")
-        card.print_question()
+        card.print_question(deck.cards.index(card))
         answer = read_answer()
         is_correct = card.is_correct(answer)
         result = "CORRECT" if is_correct else "INCORRECT"
@@ -104,7 +106,7 @@ def study():
             card.print_answer()
         print("\n")
         cards_counter+=1
-
+        
     grade = (score / deck.total_points) * 100
     score_out_of = f"{score} out of {deck.total_points}"
     if grade > 80:
@@ -118,12 +120,11 @@ def study():
 
 study()
 
-# card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
-# # card.update_difficult(5)
-#
-# print(f"Card difficulty: {card.difficulty}")
-# card.print_question()
-# answer = read_answer()
-# is_correct = card.is_correct(answer)
-# result = "CORRECT" if is_correct else "INCORRECT"
-# print(f'Your answer is {result}.')
+card = Card(['What is the output of the following code snippet?', '10', '5', '25', 2, 'A'])
+card.update_difficult(5)
+print(f"Card difficulty: {card.difficulty}")
+card.print_question()
+answer = read_answer()
+is_correct = card.is_correct(answer)
+result = "CORRECT" if is_correct else "INCORRECT"
+print(f'Your answer is {result}.')
