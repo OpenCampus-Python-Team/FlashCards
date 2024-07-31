@@ -49,8 +49,8 @@ class Deck:
     def set_total_points(self):
         self.total_points = sum(card.difficulty for card in self.cards)
 
-def update_text(text):
-    label.config(text=text)  # Update the label text
+def update_text(new_text):
+    label.config(text=new_text)  # Update the label text
 
 def button_click(answer):
     result = "CORRECT" if current_card.is_correct(answer) else "INCORRECT"
@@ -78,7 +78,8 @@ def get_unseen_card_number(total_cards, viewed_cards):
     return card_number
 
 def update_question():
-    label.config(text=current_card.question)
+    new_question=current_card.question
+    label.config(text=new_question)
     A_button.config(text=current_card.answer_possibilities[0])
     B_button.config(text=current_card.answer_possibilities[1])
     C_button.config(text=current_card.answer_possibilities[2])
