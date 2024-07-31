@@ -62,11 +62,16 @@ def button_click(answer):
 def next_question():
     global current_card, current_card_number
     current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
-    viewed_cards.append(current_card_number)
-    current_card = deck.cards[current_card_number]
-    update_question()
+    if current_card == -1:
+        update_text("Thanks for playing")
+    else:
+        viewed_cards.append(current_card_number)
+        current_card = deck.cards[current_card_number]
+        update_question()
 
 def get_unseen_card_number(total_cards, viewed_cards):
+    if len(viewed_cards) == total_cards:
+        return -1
     card_number = -1
     while card_number == -1 or card_number in viewed_cards:
         card_number = random.randint(0, total_cards - 1)

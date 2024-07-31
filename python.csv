@@ -1,16 +1,10 @@
 Question;Option A;Option B;Option C;Difficulty;Correct Answer
-What is the output of the following code snippet?;10;5;25;3;A
 Which of the following is a correct way to comment multiple lines in Python?;''' comment ''';# comment #;/* comment */;2;A
 What does the 'range()' function in Python return?;List of integers;Tuple of integers;Immutable sequence of integers;5;C
-What is the output of the following code snippet?;TypeError;Hello;Hello3;5;A
-What is the output of the following code snippet?;4;4.5;Error;3;A
 Which of the following is not a valid variable name in Python?;my_variable;2variable;variable_2;4;B
 What will be the output of the following code?;IndexError;None;3;3;A
 What does the 'len()' function do in Python?;Returns the length of the list;Returns the length of the string;Returns the length of the dictionary;4;A
 What is the correct way to create a function in Python?;def my_function();function my_function();create my_function();5;A
-What is the output of the following code snippet?;thon;Py;Pyt;1;A
-What will be the output of the following code?;10;25;7;5;B
 What does the 'append()' method do in Python lists?;Adds an element to the beginning of the list;Adds an element to the end of the list;Removes an element from the list;3;B
-What will be the output of the following code?;[1, 2, 3, 4, 5];[1, 2, 3, [4, 5]];[1, 2, 3, 4, 5, [4, 5]];3;B
 What is the correct way to check if two variables refer to the same object in memory?;x is y;x == y;x.equals(y);2;A
 What does the 'strip()' method do in Python?;Removes leading and trailing whitespaces;Removes characters from the beginning of a string;Removes characters from the end of a string;3;A
