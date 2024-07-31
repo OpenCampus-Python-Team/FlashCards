@@ -48,17 +48,19 @@ class Deck:
 
     def set_total_points(self):
         self.total_points = sum(card.difficulty for card in self.cards)
-
+# Updates the Label text which is showing the Questions
 def update_text(new_text):
-    label.config(text=new_text)  # Update the label text
-
+    label.config(text=new_text)
+    
+# Checks if the Button which is pressed represents the right answer or not
 def button_click(answer):
     result = "CORRECT" if current_card.is_correct(answer) else "INCORRECT"
     if result == "INCORRECT":
         result = result + " " + current_card.print_answer()
     update_text(result)
-    window.after(2000, next_question)  # Wait for 2 seconds before showing the next question
-
+    # Wait for 2 seconds before showing the next question
+    window.after(2000, next_question)  
+# Select the next_question which will be ask
 def next_question():
     global current_card, current_card_number
     current_card_number = get_unseen_card_number(len(deck.cards), viewed_cards)
@@ -68,7 +70,7 @@ def next_question():
         viewed_cards.append(current_card_number)
         current_card = deck.cards[current_card_number]
         update_question()
-
+#Returns a Card which havent been asked
 def get_unseen_card_number(total_cards, viewed_cards):
     if len(viewed_cards) == total_cards:
         return -1
@@ -76,7 +78,7 @@ def get_unseen_card_number(total_cards, viewed_cards):
     while card_number == -1 or card_number in viewed_cards:
         card_number = random.randint(0, total_cards - 1)
     return card_number
-
+# Updates the whole GUI to represent the current Question with the possible Answers
 def update_question():
     new_question=current_card.question
     label.config(text=new_question)
